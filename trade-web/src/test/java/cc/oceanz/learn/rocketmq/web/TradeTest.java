@@ -57,10 +57,10 @@ public class TradeTest {
                         latch.await();
 
                         TradeOrderRet tradeOrderRet = orderApi.confirmOrder(tradeOrderReq);
-                        System.out.println(ai.incrementAndGet() + "------------->" + JSON.toJSONString(tradeOrderRet));
+                        System.out.println(String.format("%-3s", ai.incrementAndGet()) + "------------->" + JSON.toJSONString(tradeOrderRet));
                     } catch (Exception e) {
                         //                e.printStackTrace();
-                        System.out.println(ai.incrementAndGet() + e.getMessage());
+                        System.out.println(String.format("%-3s", ai.incrementAndGet()) + e.getMessage());
                     }
                 }
             });
