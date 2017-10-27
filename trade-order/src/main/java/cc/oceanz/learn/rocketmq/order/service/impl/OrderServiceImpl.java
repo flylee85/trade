@@ -26,6 +26,7 @@ import org.springframework.transaction.support.TransactionCallback;
 import org.springframework.transaction.support.TransactionTemplate;
 
 import java.math.BigDecimal;
+import java.security.PrivateKey;
 import java.util.Date;
 
 /**
@@ -72,37 +73,70 @@ public class OrderServiceImpl extends AbstractBaseService<TradeOrder> implements
         return tradeOrder;
     }
 
+    // ------------------------------------------------------------------------
+    class CouponException extends RuntimeException {
+        public CouponException(Throwable cause) {
+            super(cause);
+        }
+    }
+
+    class OrderException extends RuntimeException {
+        public OrderException(Throwable cause) {
+            super(cause);
+        }
+    }
+
+    class GoodsException extends RuntimeException {
+        public GoodsException(Throwable cause) {
+            super(cause);
+        }
+    }
+    // ------------------------------------------------------------------------
+
     private void callRemoteService(String orderId, TradeOrderReq tradeOrderReq) {
+
         try {
             // 1.使用优惠券
-            if (StringUtils.isNotBlank(tradeOrderReq.getCouponId())) {
-                TradeCouponReq tradeCouponReq = new TradeCouponReq();
-                tradeCouponReq.setOrderId(orderId);
-                tradeCouponReq.setCouponId(tradeOrderReq.getCouponId());
-                tradeCouponReq.setIsUsed(YesNoEnum.YES.getCode());
-                couponApi.changeCouponStatus(tradeCouponReq);
+            try {
+                if (StringUtils.isNotBlank(tradeOrderReq.getCouponId())) {
+                    TradeCouponReq tradeCouponReq = new TradeCouponReq();
+                    tradeCouponReq.setOrderId(orderId);
+                    tradeCouponReq.setCouponId(tradeOrderReq.getCouponId());
+                    tradeCouponReq.setIsUsed(YesNoEnum.YES.getCode());
+                    couponApi.changeCouponStatus(tradeCouponReq);
+                }
+            } catch (Exception e) {
+                throw new CouponException(e);
             }
 
             // 2.扣余额
-            if (tradeOrderReq.getMoneyPaid() != null && BigDecimal.ZERO.compareTo(tradeOrderReq.getMoneyPaid()) == -1) {
-                TradeUsrReq tradeUsrReq = new TradeUsrReq();
-                tradeUsrReq.setUsrId(tradeOrderReq.getUserId());
-                tradeUsrReq.setOrderId(orderId);
-                tradeUsrReq.setUsrMoney(tradeOrderReq.getMoneyPaid());
-                tradeUsrReq.setMoneyLogType(MoneyLogTypeEnum.PAYMENT.getCode());
-                usrApi.changeUsrMoney(tradeUsrReq);
+            try {
+                if (tradeOrderReq.getMoneyPaid() != null && BigDecimal.ZERO.compareTo(tradeOrderReq.getMoneyPaid()) == -1) {
+                    TradeUsrReq tradeUsrReq = new TradeUsrReq();
+                    tradeUsrReq.setUsrId(tradeOrderReq.getUserId());
+                    tradeUsrReq.setOrderId(orderId);
+                    tradeUsrReq.setUsrMoney(tradeOrderReq.getMoneyPaid());
+                    tradeUsrReq.setMoneyLogType(MoneyLogTypeEnum.PAYMENT.getCode());
+                    usrApi.changeUsrMoney(tradeUsrReq);
+                }
+            } catch (OrderException e) {
+                throw new CouponException(e);
             }
 
             // 3.扣库存
-            TradeGoodsReq tradeGoodsReq = new TradeGoodsReq();
-            tradeGoodsReq.setGoodsId(tradeOrderReq.getGoodsId());
-            tradeGoodsReq.setGoodsNumber(tradeOrderReq.getGoodsNumber());
-            goodsApi.reduceGoodsNumber(tradeGoodsReq);
+            try {
+                TradeGoodsReq tradeGoodsReq = new TradeGoodsReq();
+                tradeGoodsReq.setGoodsId(tradeOrderReq.getGoodsId());
+                tradeGoodsReq.setGoodsNumber(tradeOrderReq.getGoodsNumber());
+                goodsApi.reduceGoodsNumber(tradeGoodsReq);
+            } catch (GoodsException e) {
+                throw new GoodsException(e);
+            }
 
             // 异常模拟
-            if (true) {
-                throw new TradeException("人工异常");
-            }
+            //            if (true) {
+            //                throw new TradeException("人工异常");
+            //            }
 
             // 4.更改订单状态
             TradeOrder tradeOrder = new TradeOrder();
@@ -112,6 +146,15 @@ public class OrderServiceImpl extends AbstractBaseService<TradeOrder> implements
             this.update(tradeOrder);
 
         } catch (Exception e) {
+            MQEnums.TopicEnum topicEnum = MQEnums.TopicEnum.ORDER_CANCEL_ALL;
+
+            if (e instanceof CouponException) {
+                topicEnum = MQEnums.TopicEnum.ORDER_CANCEL_COUPON;
+            } else if (e instanceof OrderException) {
+                topicEnum = MQEnums.TopicEnum.ORDER_CANCEL_ORDER;
+            } else if (e instanceof GoodsException) {
+                topicEnum = MQEnums.TopicEnum.ORDER_CANCEL_GOODS;
+            }
 
             // 发送mq消息
             CancelOrderMq cancelOrderMq = new CancelOrderMq();
@@ -122,7 +165,7 @@ public class OrderServiceImpl extends AbstractBaseService<TradeOrder> implements
             cancelOrderMq.setGoodsNumber(tradeOrderReq.getGoodsNumber());
             cancelOrderMq.setUsrMoney(tradeOrderReq.getMoneyPaid());
             try {
-                SendResult sendResult = mqProducer.sendMsg(MQEnums.TopicEnum.ORDER_CANCEL, orderId, JSON.toJSONString(cancelOrderMq));
+                SendResult sendResult = mqProducer.sendMsg(topicEnum, orderId, JSON.toJSONString(cancelOrderMq));
                 LOGGER.info("sendResult: {}.", JSON.toJSONString(sendResult));
             } catch (TradeMqException tme) {
                 // 这里不做处理，定时任务扫trade_order表，对长时间未确认的订单补发消息

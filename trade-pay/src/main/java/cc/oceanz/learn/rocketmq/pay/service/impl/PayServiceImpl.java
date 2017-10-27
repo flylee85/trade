@@ -4,18 +4,20 @@ import cc.oceanz.learn.rocketmq.constants.MQEnums;
 import cc.oceanz.learn.rocketmq.enums.YesNoEnum;
 import cc.oceanz.learn.rocketmq.exception.TradeException;
 import cc.oceanz.learn.rocketmq.pay.mapper.TradeMqProduceTempMapper;
-import cc.oceanz.learn.rocketmq.pay.mapper.TradePayMapper;
 import cc.oceanz.learn.rocketmq.pay.model.TradeMqProduceTemp;
 import cc.oceanz.learn.rocketmq.pay.model.TradePay;
 import cc.oceanz.learn.rocketmq.pay.service.IPayService;
 import cc.oceanz.learn.rocketmq.protocol.CallbackPaymentReq;
 import cc.oceanz.learn.rocketmq.protocol.CreatePaymentReq;
+import cc.oceanz.learn.rocketmq.protocol.TradePayQuery;
 import cc.oceanz.learn.rocketmq.uitl.mq.MqProducer;
 import cc.oceanz.learn.rocketmq.uitl.mq.protocol.PaidMQ;
 import cc.oceanz.learn.rocketmq.uitl.util.IDGenerator;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.rocketmq.client.producer.SendResult;
 import com.alibaba.rocketmq.client.producer.SendStatus;
+import com.github.pagehelper.PageHelper;
+import com.github.pagehelper.PageInfo;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -27,6 +29,7 @@ import org.springframework.transaction.annotation.Transactional;
 import tk.mybatis.mapper.entity.Example;
 
 import java.util.Date;
+import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
@@ -39,8 +42,6 @@ public class PayServiceImpl extends AbstractBaseService<TradePay> implements IPa
     private static final Logger      LOGGER          = LoggerFactory.getLogger(PayServiceImpl.class);
 
     @Autowired
-    private TradePayMapper           tradePayMapper;
-    @Autowired
     private TradeMqProduceTempMapper tradeMqProduceTempMapper;
     @Autowired
     private MqProducer               mqProducer;
@@ -51,11 +52,10 @@ public class PayServiceImpl extends AbstractBaseService<TradePay> implements IPa
     @Override
     public void createPayment(CreatePaymentReq createPaymentReq) {
         Example example = new Example(TradePay.class);
-        Example.Criteria criteria = example.createCriteria();
-        criteria //
+        example.createCriteria() //
             .andEqualTo("orderId", createPaymentReq.getOrderId()) //
             .andEqualTo("isPaid", YesNoEnum.YES.getCode());
-        int i = tradePayMapper.selectCountByExample(example);
+        int i = this.selectCountByExample(example);
         if (i > 0) {
             throw new TradeException("该订单已支付");
         }
@@ -68,7 +68,7 @@ public class PayServiceImpl extends AbstractBaseService<TradePay> implements IPa
         tradePay.setPayAmount(createPaymentReq.getPayAmount());
         tradePay.setIsPaid(YesNoEnum.NO.getCode());
 
-        tradePayMapper.insert(tradePay);
+        this.insert(tradePay);
         LOGGER.info("创建支付订单成功, paiId : {}", payId);
     }
 
@@ -76,9 +76,9 @@ public class PayServiceImpl extends AbstractBaseService<TradePay> implements IPa
     @Override
     public void callbackPayment(CallbackPaymentReq callbackPaymentReq) {
 
-        final TradePay tradePay = tradePayMapper.selectByPrimaryKey(callbackPaymentReq.getOrderId());
+        final TradePay tradePay = this.selectByKey(callbackPaymentReq.getPayId());
         if (tradePay == null) {
-            throw new TradeException("订单不存在");
+            throw new TradeException("支付订单不存在");
         }
 
         if (StringUtils.equals(YesNoEnum.YES.getCode(), tradePay.getIsPaid())) {
@@ -91,7 +91,7 @@ public class PayServiceImpl extends AbstractBaseService<TradePay> implements IPa
         }
 
         tradePay.setIsPaid(YesNoEnum.YES.getCode());
-        int i = tradePayMapper.updateByPrimaryKeySelective(tradePay);
+        int i = this.update(tradePay);
         // 发送可靠消息
         if (i > 0) {
             final PaidMQ paidMQ = new PaidMQ();
@@ -114,7 +114,7 @@ public class PayServiceImpl extends AbstractBaseService<TradePay> implements IPa
                 @Override
                 public void run() {
                     try {
-                        SendResult sendResult = mqProducer.sendMsg(MQEnums.TopicEnum.PAY_PAID, paidMQ.getPayId(), JSON.toJSONString(paidMQ));
+                        SendResult sendResult = mqProducer.sendMsg(MQEnums.TopicEnum.PAY_PAID, paidMQ.getPayId() + "", JSON.toJSONString(paidMQ));
                         if (sendResult.getSendStatus().equals(SendStatus.SEND_OK)) {
                             tradeMqProduceTempMapper.deleteByPrimaryKey(tradeMqProduceTemp.getId());
                         }
@@ -126,5 +126,18 @@ public class PayServiceImpl extends AbstractBaseService<TradePay> implements IPa
         } else {
             throw new TradeException("该订单已支付");
         }
+    }
+
+    @Override
+    public PageInfo<TradePay> queryTradePays(TradePayQuery tradePayQuery, int page, int rows) {
+        PageHelper.startPage(page, rows);
+        Example example = new Example(TradePay.class);
+        if (tradePayQuery != null && StringUtils.isNotBlank(tradePayQuery.getIsPaid())) {
+            example.createCriteria() //
+                .andEqualTo("isPaid", tradePayQuery.getIsPaid());
+        }
+
+        List<TradePay> tradePayList = this.selectByExample(example);
+        return new PageInfo<>(tradePayList);
     }
 }

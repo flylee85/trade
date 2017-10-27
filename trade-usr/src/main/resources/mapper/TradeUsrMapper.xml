@@ -3,7 +3,7 @@
 <mapper namespace="cc.oceanz.learn.rocketmq.usr.mapper.TradeUsrMapper">
 
     <update id="reduceUsrMoney" parameterType="TradeUsr">
-        UPDATE trade_usr t SET t.usr_money = t.usr_money - #{usrMoney} WHERE t.usr_id = #{usrId}
+        UPDATE trade_usr t SET t.usr_money = t.usr_money - #{usrMoney} WHERE t.usr_id = #{usrId} AND t.usr_money >= #{usrMoney}
     </update>
 
     <update id="addUsrMoney" parameterType="TradeUsr">

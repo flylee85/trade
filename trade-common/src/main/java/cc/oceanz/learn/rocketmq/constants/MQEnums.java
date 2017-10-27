@@ -6,7 +6,15 @@ package cc.oceanz.learn.rocketmq.constants;
 public class MQEnums {
 
     public enum TopicEnum {
-                           ORDER_TOPIC("orderTopic", "confirm"), ORDER_CANCEL("orderTopic", "cancel"), PAY_PAID("payTopic", "paid");
+
+        ORDER_TOPIC("orderTopic", "confirm"),
+
+        ORDER_CANCEL_COUPON("orderTopic", "cancelCoupon"),
+        ORDER_CANCEL_ORDER("orderTopic", "cancelOrder"),
+        ORDER_CANCEL_GOODS("orderTopic", "cancelGoods"),
+        ORDER_CANCEL_ALL("orderTopic", "cancelAll"),
+
+        PAY_PAID("payTopic", "paid");
 
         private String topic;
         private String tag;

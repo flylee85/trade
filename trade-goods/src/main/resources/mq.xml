@@ -7,7 +7,7 @@
         <property name="namesrvAddr" value="47.94.195.52:9876;47.94.195.52:9877"/>
         <property name="groupName" value="trade_goods_consumer_group"/>
         <property name="topic" value="orderTopic"/>
-        <property name="tags" value="cancel"/>
+        <property name="tags" value="cancelGoods  | cancelAll"/>
         <property name="messageProcessor">
             <bean class="cc.oceanz.learn.rocketmq.goods.processor.CancelOrderProcessor"/>
         </property>

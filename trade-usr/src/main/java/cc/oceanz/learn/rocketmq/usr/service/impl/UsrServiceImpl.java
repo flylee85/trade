@@ -64,7 +64,10 @@ public class UsrServiceImpl extends AbstractBaseService<TradeUsr> implements IUs
             TradeUsr tradeUsr = new TradeUsr();
             tradeUsr.setUsrId(tradeUsrReq.getUsrId());
             tradeUsr.setUsrMoney(tradeUsrReq.getUsrMoney());
-            tradeUsrMapper.reduceUsrMoney(tradeUsr);
+            int i = tradeUsrMapper.reduceUsrMoney(tradeUsr);
+            if (i <= 0) {
+                throw new TradeException("Óà¶î²»×ã£¬¿Û¿îÊ§°Ü");
+            }
         }
         // b.ÍË¿î
         else if (MoneyLogTypeEnum.REFUND.getCode().equalsIgnoreCase(tradeUsrReq.getMoneyLogType())) {

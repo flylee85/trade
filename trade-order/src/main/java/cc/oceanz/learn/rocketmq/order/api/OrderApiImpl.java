@@ -5,7 +5,7 @@ import cc.oceanz.learn.rocketmq.order.service.IOrderService;
 import cc.oceanz.learn.rocketmq.protocol.TradeOrderReq;
 import cc.oceanz.learn.rocketmq.protocol.TradeOrderRet;
 import cc.oceanz.learn.rocketmq.protocol.api.IOrderApi;
-import org.springframework.beans.BeanUtils;
+import org.apache.commons.beanutils.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
@@ -20,9 +20,16 @@ public class OrderApiImpl implements IOrderApi {
 
     @Override
     public TradeOrderRet confirmOrder(TradeOrderReq tradeOrderReq) {
-        TradeOrderRet tradeOrderRet = new TradeOrderRet();
         TradeOrder tradeOrder = orderService.confirmOrder(tradeOrderReq);
-        BeanUtils.copyProperties(tradeOrder, tradeOrderRet);
-        return tradeOrderRet;
+
+        try {
+            TradeOrderRet tradeOrderRet = new TradeOrderRet();
+            BeanUtils.copyProperties(tradeOrderRet, tradeOrder);
+            return tradeOrderRet;
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        return null;
     }
 }

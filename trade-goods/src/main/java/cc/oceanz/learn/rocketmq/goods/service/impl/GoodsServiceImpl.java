@@ -25,6 +25,7 @@ public class GoodsServiceImpl extends AbstractBaseService<TradeGoods> implements
         if (tradeGoods == null || tradeGoods.getGoodsId() == null || tradeGoods.getGoodsNumber() == null) {
             throw new TradeException("参数有误");
         }
+
         int i = tradeGoodsMapper.reduceGoodsNumber(tradeGoods);
         if (i <= 0) {
             throw new TradeException("商品库存扣减失败");
