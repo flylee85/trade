@@ -23,6 +23,7 @@
 
     <properties>
         <spring.version>4.3.7.RELEASE</spring.version>
+        <jetty.version>9.4.7.RC0</jetty.version>
     </properties>
 
     <dependencyManagement>
@@ -219,9 +220,14 @@
 
             <!-- jetty -->
             <dependency>
-                <groupId>org.eclipse.jetty.aggregate</groupId>
-                <artifactId>jetty-all</artifactId>
-                <version>9.4.7.v20170914</version>
+                <groupId>org.eclipse.jetty</groupId>
+                <artifactId>jetty-server</artifactId>
+                <version>${jetty.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.eclipse.jetty</groupId>
+                <artifactId>jetty-servlet</artifactId>
+                <version>${jetty.version}</version>
             </dependency>
         </dependencies>
     </dependencyManagement>
