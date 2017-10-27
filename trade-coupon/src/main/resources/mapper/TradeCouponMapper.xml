@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cc.oceanz.learn.rocketmq.coupon.mapper.TradeCouponMapper">
+
+    <update id="useCoupon" parameterType="TradeCoupon">
+        UPDATE trade_coupon SET is_used = '1', order_id = #{orderId}, used_time = now() WHERE coupon_id = #{couponId} AND  is_used = '0'
+    </update>
+
+    <update id="unUseCoupon" parameterType="string">
+        UPDATE trade_coupon SET is_used = '0', order_id = null, used_time = null WHERE coupon_id = #{couponId} AND is_used = '1'
+    </update>
+
+</mapper>

@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cc.oceanz.learn.rocketmq.goods.mapper.TradeGoodsMapper">
+
+    <update id="reduceGoodsNumber" parameterType="TradeGoods">
+        UPDATE trade_goods t SET t.goods_number = t.goods_number - #{goodsNumber} WHERE t.goods_id = #{goodsId} AND t.goods_number >= #{goodsNumber}
+    </update>
+
+    <update id="addGoodsNumber" parameterType="TradeGoods">
+        UPDATE trade_goods t SET t.goods_number = t.goods_number + #{goodsNumber} WHERE t.goods_id = #{goodsId}
+    </update>
+
+</mapper>

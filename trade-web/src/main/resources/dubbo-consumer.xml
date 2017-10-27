@@ -1,0 +1,13 @@
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:dubbo="http://code.alibabatech.com/schema/dubbo"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+       http://code.alibabatech.com/schema/dubbo http://code.alibabatech.com/schema/dubbo/dubbo.xsd">
+
+    <dubbo:reference interface="cc.oceanz.learn.rocketmq.protocol.api.IOrderApi" id="orderApi"/>
+    <dubbo:reference interface="cc.oceanz.learn.rocketmq.protocol.api.ICouponApi" id="couponApi"/>
+    <dubbo:reference interface="cc.oceanz.learn.rocketmq.protocol.api.IUsrApi" id="usrApi"/>
+    <dubbo:reference interface="cc.oceanz.learn.rocketmq.protocol.api.IGoodsApi" id="goodsApi"/>
+    <dubbo:reference interface="cc.oceanz.learn.rocketmq.protocol.api.IPayApi" id="payApi"/>
+
+</beans>
