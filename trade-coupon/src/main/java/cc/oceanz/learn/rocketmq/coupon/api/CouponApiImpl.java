@@ -5,7 +5,7 @@ import cc.oceanz.learn.rocketmq.coupon.model.TradeCoupon;
 import cc.oceanz.learn.rocketmq.protocol.TradeCouponReq;
 import cc.oceanz.learn.rocketmq.protocol.TradeCouponRet;
 import cc.oceanz.learn.rocketmq.protocol.api.ICouponApi;
-import org.springframework.beans.BeanUtils;
+import org.apache.commons.beanutils.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
@@ -21,15 +21,20 @@ public class CouponApiImpl implements ICouponApi {
     @Override
     public TradeCouponRet queryCoupon(TradeCouponReq tradeCouponReq) {
         TradeCoupon tradeCoupon = couponService.selectByKey(tradeCouponReq.getCouponId());
-        TradeCouponRet tradeCouponRet = new TradeCouponRet();
-        BeanUtils.copyProperties(tradeCoupon, tradeCouponRet);
-        return tradeCouponRet;
+
+        try {
+            TradeCouponRet tradeCouponRet = new TradeCouponRet();
+            BeanUtils.copyProperties(tradeCouponRet, tradeCoupon);
+            return tradeCouponRet;
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        return null;
     }
 
     @Override
     public void changeCouponStatus(TradeCouponReq tradeCouponReq) {
-        TradeCoupon tradeCoupon = new TradeCoupon();
-        BeanUtils.copyProperties(tradeCouponReq, tradeCoupon);
-        couponService.changeCouponStatus(tradeCoupon);
+        couponService.changeCouponStatus(tradeCouponReq);
     }
 }

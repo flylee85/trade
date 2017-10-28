@@ -1,6 +1,5 @@
 package cc.oceanz.learn.rocketmq.uitl.mq;
 
-import cc.oceanz.learn.rocketmq.constants.MQEnums;
 import cc.oceanz.learn.rocketmq.uitl.exception.TradeMqException;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
@@ -67,10 +66,6 @@ public class MqProducer {
         if (producer != null) {
             producer.shutdown();
         }
-    }
-
-    public SendResult sendMsg(MQEnums.TopicEnum topicEnum, String keys, String msgText) throws TradeMqException {
-        return sendMsg(topicEnum.getTopic(), topicEnum.getTag(), keys, msgText);
     }
 
     public SendResult sendMsg(String topic, String tags, String keys, String msgText) throws TradeMqException {

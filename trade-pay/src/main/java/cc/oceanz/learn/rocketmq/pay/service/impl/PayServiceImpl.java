@@ -69,7 +69,7 @@ public class PayServiceImpl extends AbstractBaseService<TradePay> implements IPa
         tradePay.setIsPaid(YesNoEnum.NO.getCode());
 
         this.insert(tradePay);
-        LOGGER.info("创建支付订单成功, paiId : {}", payId);
+        LOGGER.info("创建订单成功, paiId : {}", payId);
     }
 
     @Transactional(rollbackFor = Exception.class)
@@ -114,7 +114,7 @@ public class PayServiceImpl extends AbstractBaseService<TradePay> implements IPa
                 @Override
                 public void run() {
                     try {
-                        SendResult sendResult = mqProducer.sendMsg(MQEnums.TopicEnum.PAY_PAID, paidMQ.getPayId() + "", JSON.toJSONString(paidMQ));
+                        SendResult sendResult = mqProducer.sendMsg(MQEnums.TopicEnum.PAY_PAID.getTopic(), MQEnums.TopicEnum.PAY_PAID.getTag(), paidMQ.getPayId() + "", JSON.toJSONString(paidMQ));
                         if (sendResult.getSendStatus().equals(SendStatus.SEND_OK)) {
                             tradeMqProduceTempMapper.deleteByPrimaryKey(tradeMqProduceTemp.getId());
                         }

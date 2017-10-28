@@ -1,6 +1,7 @@
 package cc.oceanz.learn.rocketmq.goods.service;
 
 import cc.oceanz.learn.rocketmq.goods.model.TradeGoods;
+import cc.oceanz.learn.rocketmq.protocol.TradeGoodsReq;
 import cc.oceanz.learn.rocketmq.service.IBaseService;
 
 /**
@@ -8,8 +9,8 @@ import cc.oceanz.learn.rocketmq.service.IBaseService;
  */
 public interface IGoodsService extends IBaseService<TradeGoods> {
 
-    void reduceGoodsNumber(TradeGoods tradeGoods);
+    void reduceGoodsNumber(TradeGoodsReq tradeGoodsReq);
 
-    void addGoodsNumber(TradeGoods tradeGoods);
+    void addGoodsNumber(TradeGoodsReq tradeGoodsReq);
 
 }

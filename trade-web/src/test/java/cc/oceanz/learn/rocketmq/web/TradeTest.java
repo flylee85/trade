@@ -2,6 +2,7 @@ package cc.oceanz.learn.rocketmq.web;
 
 import cc.oceanz.learn.rocketmq.protocol.*;
 import cc.oceanz.learn.rocketmq.protocol.api.*;
+import cc.oceanz.learn.rocketmq.uitl.util.Page;
 import com.alibaba.fastjson.JSON;
 import com.github.pagehelper.PageInfo;
 import org.junit.After;
@@ -50,10 +51,10 @@ public class TradeTest {
         ExecutorService executor = Executors.newFixedThreadPool(22);
 
         final TradePayQuery tradePayQuery = new TradePayQuery();
-        PageInfo<TradePayRet> pageInfo = payApi.queryTradePays(tradePayQuery, 1, 100);
+        Page<TradePayRet> page = payApi.queryTradePays(tradePayQuery, 1, 100);
 
-        List<TradePayRet> list = pageInfo.getList();
-        for (final TradePayRet tradePayRet : list) {
+        System.out.println(JSON.toJSONString(page));
+        for (final TradePayRet tradePayRet : page.getList()) {
             executor.submit(new Runnable() {
                 @Override
                 public void run() {
@@ -71,12 +72,6 @@ public class TradeTest {
                 break;
             }
         }
-    }
-
-    @Test
-    public void createPayment() {
-        CallbackPaymentReq callbackPaymentReq = new CallbackPaymentReq();
-        payApi.callbackPayment(callbackPaymentReq);
     }
 
     @Test

@@ -10,24 +10,13 @@
     </parent>
 
     <artifactId>trade-dao</artifactId>
-
     <packaging>jar</packaging>
-
-    <properties>
-        <spring.version>4.3.7.RELEASE</spring.version>
-    </properties>
 
     <dependencies>
         <dependency>
             <groupId>cc.oceanz.learn.rocketmq</groupId>
             <artifactId>trade-common</artifactId>
             <version>1.0-SNAPSHOT</version>
-            <exclusions>
-                <exclusion>
-                    <artifactId>spring</artifactId>
-                    <groupId>org.springframework</groupId>
-                </exclusion>
-            </exclusions>
         </dependency>
     </dependencies>
 

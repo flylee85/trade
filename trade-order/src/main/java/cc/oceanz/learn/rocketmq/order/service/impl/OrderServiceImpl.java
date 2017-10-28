@@ -58,18 +58,19 @@ public class OrderServiceImpl extends AbstractBaseService<TradeOrder> implements
         checkConfirmTradeOrderReq(tradeOrderReq, tradeGoodsRet);
 
         // 2.创建不可见订单
-        String orderId = transactionTemplate.execute(new TransactionCallback<String>() {
+        TradeOrder order = transactionTemplate.execute(new TransactionCallback<TradeOrder>() {
             @Override
-            public String doInTransaction(TransactionStatus status) {
+            public TradeOrder doInTransaction(TransactionStatus status) {
                 return saveNonConfirmOrder(tradeOrderReq);
             }
         });
 
         // 3.调用远程服务，扣库存，扣减用户金额，如果成功->更改订单状态可见，失败->发送mq消息进行取消订单
-        callRemoteService(orderId, tradeOrderReq);
+        callRemoteService(order.getOrderId(), tradeOrderReq);
 
         TradeOrder tradeOrder = new TradeOrder();
-        tradeOrder.setOrderId(orderId);
+        tradeOrder.setOrderId(order.getOrderId());
+        tradeOrder.setPayAmount(order.getPayAmount());
         return tradeOrder;
     }
 
@@ -165,7 +166,7 @@ public class OrderServiceImpl extends AbstractBaseService<TradeOrder> implements
             cancelOrderMq.setGoodsNumber(tradeOrderReq.getGoodsNumber());
             cancelOrderMq.setUsrMoney(tradeOrderReq.getMoneyPaid());
             try {
-                SendResult sendResult = mqProducer.sendMsg(topicEnum, orderId, JSON.toJSONString(cancelOrderMq));
+                SendResult sendResult = mqProducer.sendMsg(topicEnum.getTopic(), topicEnum.getTag(), orderId, JSON.toJSONString(cancelOrderMq));
                 LOGGER.info("sendResult: {}.", JSON.toJSONString(sendResult));
             } catch (TradeMqException tme) {
                 // 这里不做处理，定时任务扫trade_order表，对长时间未确认的订单补发消息
@@ -175,7 +176,7 @@ public class OrderServiceImpl extends AbstractBaseService<TradeOrder> implements
         }
     }
 
-    private String saveNonConfirmOrder(TradeOrderReq tradeOrderReq) {
+    private TradeOrder saveNonConfirmOrder(TradeOrderReq tradeOrderReq) {
         TradeOrder tradeOrder = new TradeOrder();
 
         String orderId = IDGenerator.generateUUID();
@@ -261,7 +262,7 @@ public class OrderServiceImpl extends AbstractBaseService<TradeOrder> implements
             throw new TradeException("创建订单失败");
         }
 
-        return orderId;
+        return tradeOrder;
     }
 
     private BigDecimal calculateShippingFee(BigDecimal goodsAmount) {

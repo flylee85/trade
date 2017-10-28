@@ -4,6 +4,7 @@ import cc.oceanz.learn.rocketmq.protocol.CallbackPaymentReq;
 import cc.oceanz.learn.rocketmq.protocol.CreatePaymentReq;
 import cc.oceanz.learn.rocketmq.protocol.TradePayQuery;
 import cc.oceanz.learn.rocketmq.protocol.TradePayRet;
+import cc.oceanz.learn.rocketmq.uitl.util.Page;
 import com.github.pagehelper.PageInfo;
 
 /**
@@ -11,7 +12,7 @@ import com.github.pagehelper.PageInfo;
  */
 public interface IPayApi {
 
-    PageInfo<TradePayRet> queryTradePays(TradePayQuery tradePayQuery, int page, int rows);
+    Page<TradePayRet> queryTradePays(TradePayQuery tradePayQuery, int page, int rows);
 
     void createPayment(CreatePaymentReq createPaymentReq);
 

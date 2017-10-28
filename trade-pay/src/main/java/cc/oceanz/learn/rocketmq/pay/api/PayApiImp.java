@@ -7,8 +7,8 @@ import cc.oceanz.learn.rocketmq.protocol.CallbackPaymentReq;
 import cc.oceanz.learn.rocketmq.protocol.TradePayQuery;
 import cc.oceanz.learn.rocketmq.protocol.TradePayRet;
 import cc.oceanz.learn.rocketmq.protocol.api.IPayApi;
+import cc.oceanz.learn.rocketmq.uitl.util.Page;
 import com.github.pagehelper.PageInfo;
-import org.apache.commons.beanutils.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
@@ -22,18 +22,9 @@ public class PayApiImp implements IPayApi {
     private IPayService payService;
 
     @Override
-    public PageInfo<TradePayRet> queryTradePays(TradePayQuery tradePayQuery, int page, int rows) {
+    public Page<TradePayRet> queryTradePays(TradePayQuery tradePayQuery, int page, int rows) {
         PageInfo<TradePay> tradePayPageInfo = payService.queryTradePays(tradePayQuery, page, rows);
-
-        try {
-            PageInfo<TradePayRet> tradePayRetPageInfo = new PageInfo<>();
-            BeanUtils.copyProperties(tradePayRetPageInfo, tradePayPageInfo);
-            return tradePayRetPageInfo;
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-
-        return null;
+        return new Page(TradePayRet.class, tradePayPageInfo);
     }
 
     @Override

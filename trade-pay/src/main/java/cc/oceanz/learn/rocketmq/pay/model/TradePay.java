@@ -13,11 +13,11 @@ public class TradePay implements Serializable {
     private static final long serialVersionUID = 5773018959118309482L;
 
     @Id
-    @Column(name = "order_id")
-    private String            orderId;
-
     @Column(name = "pay_id")
     private String            payId;
+
+    @Column(name = "order_id")
+    private String            orderId;
 
     @Column(name = "pay_amount")
     private BigDecimal        payAmount;

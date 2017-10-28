@@ -22,11 +22,6 @@
             <artifactId>trade-dao</artifactId>
             <version>1.0-SNAPSHOT</version>
         </dependency>
-        <dependency>
-            <groupId>cc.oceanz.learn.rocketmq</groupId>
-            <artifactId>trade-util</artifactId>
-            <version>1.0-SNAPSHOT</version>
-        </dependency>
 
         <dependency>
             <groupId>mysql</groupId>
