@@ -8,7 +8,9 @@
     <dubbo:application name="${application.name}"/>
     <!-- 使用zookeeper注册中心暴露服务地址 -->
     <dubbo:registry protocol="zookeeper" address="${dubbo.registry.address}"/>
-    <!-- 用dubbo协议在某个端口暴露服务 -->
+    <!-- 用dubbo协议在某个端口暴露服务
+        dubbo的序列化支持dubbo、hession2、java、completedjava以及http协议的json等
+     -->
     <dubbo:protocol name="dubbo" port="${dubbo.protocol.port}"/>
 
     <dubbo:provider timeout="10000" threadpool="fixed" threads="100" accepts="1000"/>
