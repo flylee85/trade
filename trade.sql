@@ -12,18 +12,12 @@
 /*!40101 SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='NO_AUTO_VALUE_ON_ZERO' */;
 
 
--- 导出 eshop 的数据库结构
-CREATE DATABASE IF NOT EXISTS `eshop` /*!40100 DEFAULT CHARACTER SET utf8 COLLATE utf8_bin */;
-USE `eshop`;
-
--- 导出  表 eshop.product_inventory_cnt 结构
-CREATE TABLE IF NOT EXISTS `product_inventory_cnt` (
-  `product_id` int(11) NOT NULL,
-  `inventory_cnt` bigint(20) NOT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_bin;
+-- 导出 trade 的数据库结构
+CREATE DATABASE IF NOT EXISTS `trade` /*!40100 DEFAULT CHARACTER SET utf8 COLLATE utf8_bin */;
+USE `trade`;
 
 -- 数据导出被取消选择。
--- 导出  表 eshop.trade_coupon 结构
+-- 导出  表 trade.trade_coupon 结构
 CREATE TABLE IF NOT EXISTS `trade_coupon` (
   `coupon_id` varchar(32) COLLATE utf8_bin NOT NULL DEFAULT '' COMMENT '优惠券ID',
   `coupon_price` decimal(10,0) DEFAULT NULL COMMENT '优惠券金额',
@@ -35,7 +29,7 @@ CREATE TABLE IF NOT EXISTS `trade_coupon` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_bin COMMENT='优惠表';
 
 -- 数据导出被取消选择。
--- 导出  表 eshop.trade_goods 结构
+-- 导出  表 trade.trade_goods 结构
 CREATE TABLE IF NOT EXISTS `trade_goods` (
   `goods_id` int(11) NOT NULL AUTO_INCREMENT COMMENT '商品ID',
   `goods_name` varchar(255) COLLATE utf8_bin DEFAULT NULL COMMENT '商品名称',
@@ -47,7 +41,7 @@ CREATE TABLE IF NOT EXISTS `trade_goods` (
 ) ENGINE=InnoDB AUTO_INCREMENT=100002 DEFAULT CHARSET=utf8 COLLATE=utf8_bin COMMENT='商品表';
 
 -- 数据导出被取消选择。
--- 导出  表 eshop.trade_goods_number_log 结构
+-- 导出  表 trade.trade_goods_number_log 结构
 CREATE TABLE IF NOT EXISTS `trade_goods_number_log` (
   `goods_id` int(11) NOT NULL DEFAULT '0' COMMENT '商品ID',
   `order_id` varchar(32) COLLATE utf8_bin NOT NULL DEFAULT '' COMMENT '订单ID',
@@ -57,7 +51,7 @@ CREATE TABLE IF NOT EXISTS `trade_goods_number_log` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_bin COMMENT='商品数量日志';
 
 -- 数据导出被取消选择。
--- 导出  表 eshop.trade_mq_consume_log 结构
+-- 导出  表 trade.trade_mq_consume_log 结构
 CREATE TABLE IF NOT EXISTS `trade_mq_consume_log` (
   `msg_id` varchar(255) COLLATE utf8_bin NOT NULL COMMENT '消息ID',
   `group_name` varchar(255) COLLATE utf8_bin DEFAULT NULL COMMENT '消费组名',
@@ -72,7 +66,7 @@ CREATE TABLE IF NOT EXISTS `trade_mq_consume_log` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_bin;
 
 -- 数据导出被取消选择。
--- 导出  表 eshop.trade_mq_produce_temp 结构
+-- 导出  表 trade.trade_mq_produce_temp 结构
 CREATE TABLE IF NOT EXISTS `trade_mq_produce_temp` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `group_name` varchar(255) COLLATE utf8_bin NOT NULL COMMENT '生产者组名',
@@ -85,7 +79,7 @@ CREATE TABLE IF NOT EXISTS `trade_mq_produce_temp` (
 ) ENGINE=InnoDB AUTO_INCREMENT=94 DEFAULT CHARSET=utf8 COLLATE=utf8_bin;
 
 -- 数据导出被取消选择。
--- 导出  表 eshop.trade_order 结构
+-- 导出  表 trade.trade_order 结构
 CREATE TABLE IF NOT EXISTS `trade_order` (
   `order_id` varchar(32) COLLATE utf8_bin NOT NULL COMMENT '订单ID',
   `user_id` int(11) DEFAULT NULL COMMENT '用户ID',
@@ -111,7 +105,7 @@ CREATE TABLE IF NOT EXISTS `trade_order` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_bin COMMENT='订单表';
 
 -- 数据导出被取消选择。
--- 导出  表 eshop.trade_pay 结构
+-- 导出  表 trade.trade_pay 结构
 CREATE TABLE IF NOT EXISTS `trade_pay` (
   `pay_id` varchar(255) COLLATE utf8_bin NOT NULL,
   `order_id` varchar(32) COLLATE utf8_bin NOT NULL DEFAULT '' COMMENT '订单编号',
@@ -121,7 +115,7 @@ CREATE TABLE IF NOT EXISTS `trade_pay` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_bin COMMENT='支付表';
 
 -- 数据导出被取消选择。
--- 导出  表 eshop.trade_usr 结构
+-- 导出  表 trade.trade_usr 结构
 CREATE TABLE IF NOT EXISTS `trade_usr` (
   `usr_id` int(11) NOT NULL AUTO_INCREMENT COMMENT '用户ID',
   `usr_name` varchar(255) COLLATE utf8_bin DEFAULT NULL COMMENT '用户姓名',
@@ -134,7 +128,7 @@ CREATE TABLE IF NOT EXISTS `trade_usr` (
 ) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8 COLLATE=utf8_bin COMMENT='用户表';
 
 -- 数据导出被取消选择。
--- 导出  表 eshop.trade_usr_money_log 结构
+-- 导出  表 trade.trade_usr_money_log 结构
 CREATE TABLE IF NOT EXISTS `trade_usr_money_log` (
   `usr_id` int(11) NOT NULL DEFAULT '0' COMMENT '用户ID',
   `order_id` varchar(32) COLLATE utf8_bin NOT NULL DEFAULT '' COMMENT '订单ID',
@@ -143,15 +137,6 @@ CREATE TABLE IF NOT EXISTS `trade_usr_money_log` (
   `create_time` datetime DEFAULT NULL COMMENT '发生时间',
   PRIMARY KEY (`usr_id`,`order_id`,`money_log_type`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_bin COMMENT='用户发生金额日志表';
-
--- 数据导出被取消选择。
--- 导出  表 eshop.user 结构
-CREATE TABLE IF NOT EXISTS `user` (
-  `id` int(11) NOT NULL AUTO_INCREMENT,
-  `name` varchar(255) COLLATE utf8_bin DEFAULT NULL,
-  `age` int(11) DEFAULT NULL,
-  PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8 COLLATE=utf8_bin;
 
 -- 数据导出被取消选择。
 /*!40101 SET SQL_MODE=IFNULL(@OLD_SQL_MODE, '') */;
