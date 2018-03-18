@@ -1,2 +1,2 @@
 # trade
-rocketmq视频学习代码跟进
+rocketmq学习代码跟进
